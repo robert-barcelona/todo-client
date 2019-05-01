@@ -1,0 +1,15 @@
+.hero {
+  margin-bottom: 30px;
+}
+
+.todoListItem {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+.todoListItem a {
+  margin: 5px;
+  cursor: pointer;
+}
+
+/*# sourceMappingURL=main.css.map */

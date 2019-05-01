@@ -45,6 +45,16 @@ const SET_TODO_COMPLETE = gql`
     }
   }
 
+
+`
+
+const DELETE_TODO = gql`
+  mutation DeleteTodo($id:ID!) {
+    deleteTodo(id:$id) {
+      id
+    }
+  }
+
 `
 
 //let showCompleted = false
@@ -110,6 +120,13 @@ class List extends Component {
     //  refetch()
   }
 
+  refetchAllFilteredTodos = () => {
+    const {state: {showIncompleteOnly, filterText}} = this
+    return [{
+    query: GET_TODOS_FILTERED,
+    variables: {showIncompleteOnly, filterText}
+  }]}
+
 
   render() {
 
@@ -120,12 +137,7 @@ class List extends Component {
         <section className='column is-half'>
 
           <Mutation mutation={ADD_TODO}
-                    refetchQueries={() => {
-                      return [{
-                        query: GET_TODOS_FILTERED,
-                        variables: {showIncompleteOnly, filterText}
-                      }];
-                    }}
+                    refetchQueries={this.refetchAllFilteredTodos}
           >
             {(addTodo, {loading, error, data}) => {
               if (loading) return <div>Loading...</div>
@@ -182,11 +194,14 @@ class List extends Component {
             }
           </Mutation>
         </section>
+
         <section className='column is-half'>
 
           <Query query={GET_TODOS_FILTERED}
                  variables={{showIncompleteOnly, filterText}}
-                 onCompleted={() => {console.log('focusing');if (this.filterTextRef.current) this.filterTextRef.current.focus()}}
+                 onCompleted={() => {
+                   if (this.filterTextRef.current) this.filterTextRef.current.focus()
+                 }}
 
           >
             {({loading, error, data, refetch}) => {
@@ -220,26 +235,35 @@ class List extends Component {
 
 
                   {data && data.getTodosFiltered && <ul className='list'>
-                    {data.getTodosFiltered.map(todo => <li className='jobListItem has-text-warning has-background-link'
+                    {data.getTodosFiltered.map(todo => <li className='todoListItem has-text-warning has-background-link'
                                                            key={todo.id}>Title: {todo.title},
                       Body: {todo.body}
                       Completed: {todo.completed ? 'true' : 'false'}
                       <Mutation mutation={SET_TODO_COMPLETE} variables={{id: todo.id, completed: todo.completed}}
-                                refetchQueries={() => [{
-                                  query: GET_TODOS_FILTERED,
-                                  variables: {showIncompleteOnly, filterText}
-                                }]}
+                                refetchQueries={this.refetchAllFilteredTodos}
+
                                 onError={(e) => console.log('error in TodoItem mutation', e)}>
                         {(toggle, {data, error, loading}) => {
-                          return <label className="checkbox">
+                          return <label className="checkbox"> Completed:
                             <input type="checkbox" checked={todo.completed}
                                    onChange={e => this.checkboxToggle(toggle, todo.id, e.target.checked)}/>
-                            Completed
+
                           </label>
                         }
 
                         }
 
+
+                      </Mutation>
+                      <Mutation mutation={DELETE_TODO}
+                                refetchQueries={this.refetchAllFilteredTodos}
+                      >
+                        {(deleteTodo, {data, error}) => (
+                          <a href='#' className='list-item' onClick={e => {
+                            e.preventDefault();
+                            deleteTodo({variables: {id: todo.id}})
+                          }}>Delete: <i className="fas fa-trash-alt"></i></a>
+                        )}
 
                       </Mutation>
                     </li>)}
