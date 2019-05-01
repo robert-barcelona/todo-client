@@ -41,7 +41,10 @@ class Login extends Component {
     const {props: {history}} = this
     const {state: {username, password}} = this
 
-    return <Mutation mutation={LOGIN} onCompleted={data => {
+    return <Mutation mutation={LOGIN}
+
+                     update={(cache,data)=>cache.writeData({data:{loggedIn:true}})}
+                     onCompleted={data => {
       if (data && data.login) {
         const {login: {token}} = data
         if (token) {

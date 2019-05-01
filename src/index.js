@@ -44,11 +44,14 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 console.log('url is', process.env.REACT_APP_GRAPHQL_URI)
+const cache = new InMemoryCache()
 
 const client = new ApolloClient({
   link: concat(authLink,errorLink.concat(new HttpLink({ uri: process.env.REACT_APP_GRAPHQL_URI }))),
-  cache: new InMemoryCache(),
+  cache,
 });
+
+cache.writeData({data:{loggedIn:false}})
 
 ReactDOM.render(
   <BrowserRouter>
