@@ -78,16 +78,19 @@ class List extends Component {
 
   titleRef = React.createRef()
   bodyRef = React.createRef()
+  filterTextRef = React.createRef()
 
 
   state = {
     title: '',
     body: '',
     showIncompleteOnly: false,
+    filterText: '',
   }
 
   checkboxToggle = (onToggle, id, newCompleted) => {
-    onToggle({variables: {id, completed: newCompleted}})
+    const {state: {filterText}} = this
+    onToggle({variables: {id, completed: newCompleted, filterText}})
   }
 
   setTitle = e => {
@@ -97,16 +100,20 @@ class List extends Component {
     this.setState({body: e.target.value});
   }
 
-  completedFilterCheckbox = (e,refetch) => {
-   const showIncompleteOnly = e.target.checked
+  setFilterText = e => {
+    this.setState({filterText: e.target.value})
+  }
+
+  completedFilterCheckbox = (e, refetch) => {
+    const showIncompleteOnly = e.target.checked
     this.setState({showIncompleteOnly})
-  //  refetch()
+    //  refetch()
   }
 
 
   render() {
 
-    const {state: {showIncompleteOnly,body, title}} = this
+    const {state: {filterText, showIncompleteOnly, body, title}} = this
 
     return (
       <div className='columns'>
@@ -116,7 +123,7 @@ class List extends Component {
                     refetchQueries={() => {
                       return [{
                         query: GET_TODOS_FILTERED,
-                        variables: {showIncompleteOnly}
+                        variables: {showIncompleteOnly, filterText}
                       }];
                     }}
           >
@@ -177,7 +184,11 @@ class List extends Component {
         </section>
         <section className='column is-half'>
 
-          <Query query={GET_TODOS_FILTERED} variables={ {showIncompleteOnly}}>
+          <Query query={GET_TODOS_FILTERED}
+                 variables={{showIncompleteOnly, filterText}}
+                 onCompleted={() => {console.log('focusing');if (this.filterTextRef.current) this.filterTextRef.current.focus()}}
+
+          >
             {({loading, error, data, refetch}) => {
               if (loading) return <div>Loading...</div>
 
@@ -191,29 +202,38 @@ class List extends Component {
                   <div className='level'>
                     Todos
                   </div>
-                  <div className='level'>
-                    <div className='level-left'>
+                  <div className='columns'>
+                    <div className='column is-one-third'>
                       <label className="checkbox">
                         Only show uncompleted todos:
                         <input type="checkbox" onChange={e => this.completedFilterCheckbox(e, refetch)}/>
                       </label></div>
-                    <div className='level-right'>right</div>
+                    <div className='column is-two-thirds'>
+                      <label className="text">
+                        Filter todos by:
+                        <input ref={this.filterTextRef} autoFocus onChange={e => this.setFilterText(e)}
+                               className="input is-info" type="text" placeholder="Text to filter by"
+                               value={filterText}/>
+                      </label>
+                    </div>
                   </div>
 
 
-                 { data && data.getTodosFiltered && <ul className='list'>
+                  {data && data.getTodosFiltered && <ul className='list'>
                     {data.getTodosFiltered.map(todo => <li className='jobListItem has-text-warning has-background-link'
-                                                   key={todo.id}>Title: {todo.title},
+                                                           key={todo.id}>Title: {todo.title},
                       Body: {todo.body}
                       Completed: {todo.completed ? 'true' : 'false'}
-                      <Mutation mutation={SET_TODO_COMPLETE} variables={{id:todo.id, completed:todo.completed}} refetchQueries={() => [{
-                        query: GET_TODOS_FILTERED,
-                        variables: {showIncompleteOnly}
-                      }]}
+                      <Mutation mutation={SET_TODO_COMPLETE} variables={{id: todo.id, completed: todo.completed}}
+                                refetchQueries={() => [{
+                                  query: GET_TODOS_FILTERED,
+                                  variables: {showIncompleteOnly, filterText}
+                                }]}
                                 onError={(e) => console.log('error in TodoItem mutation', e)}>
                         {(toggle, {data, error, loading}) => {
                           return <label className="checkbox">
-                            <input type="checkbox" checked={todo.completed} onChange={e => this.checkboxToggle(toggle, todo.id, e.target.checked)}/>
+                            <input type="checkbox" checked={todo.completed}
+                                   onChange={e => this.checkboxToggle(toggle, todo.id, e.target.checked)}/>
                             Completed
                           </label>
                         }
