@@ -24,6 +24,43 @@ const ADD_TODO = gql`
   }
 `
 
+const SET_TODO_COMPLETE = gql`
+  mutation SetTodoComplete($id:ID! , $completed:Boolean = true) {
+    setTodoComplete(id:$id, completed:$completed) {
+      id
+      completed
+      user {
+        username
+      }
+    }
+  }
+
+`
+
+const TodoItem = ({id, completed}) => {
+  const checkboxToggle = (onToggle, id, newCompleted) => {
+    console.log( id, newCompleted)
+    onToggle({variables: {id, completed: newCompleted}})
+  }
+
+  return <Mutation mutation={SET_TODO_COMPLETE} variables={{id, completed}}  refetchQueries={() =>  [{
+    query: GET_TODOS}]}
+                   onError={(e) => console.log('error in TodoItem mutation', e)}>
+    {(toggle, {data, error, loading}) => {
+      return <label className="checkbox">
+        <input type="checkbox" checked={completed} onChange={e => checkboxToggle(toggle, id, e.target.checked)}/>
+        Completed
+      </label>
+    }
+
+    }
+
+
+  </Mutation>
+
+}
+
+
 class List extends Component {
 
   titleRef = React.createRef()
@@ -33,6 +70,7 @@ class List extends Component {
   state = {
     title: '',
     body: '',
+
   }
 
   setTitle = e => {
@@ -53,7 +91,6 @@ class List extends Component {
 
           <Mutation mutation={ADD_TODO}
                     refetchQueries={() => {
-                      console.log("refetchQueries")
                       return [{
                         query: GET_TODOS
                       }];
@@ -134,7 +171,7 @@ class List extends Component {
                                                    key={todo.id}>Title: {todo.title},
                       Body: {todo.body}
                       Completed: {todo.completed ? 'true' : 'false'}
-
+                      <TodoItem id={todo.id} completed={todo.completed}/>
 
                     </li>)}
                   </ul>
