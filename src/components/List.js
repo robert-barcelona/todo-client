@@ -11,6 +11,7 @@ const GET_TODOS_FILTERED = gql`
       body
       title
       completed
+      added
       user {
         username
       }
@@ -208,7 +209,8 @@ class List extends Component {
                                                            key={todo.id}>
                       <p><strong>Title:</strong> {todo.title}</p>
                       <p><strong>Notes:</strong> {todo.body}</p>
-                      <p><strong>Owner:</strong> {todo.user.username}</p>
+                      <p><strong>Created:</strong> {todo.added}</p>
+                      <p><strong>Created by:</strong> {todo.user.username}</p>
                       <Mutation mutation={SET_TODO_COMPLETE} variables={{id: todo.id, completed: todo.completed}}
                                 refetchQueries={this.refetchAllFilteredTodos}
 
