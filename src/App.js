@@ -49,9 +49,9 @@ class App extends Component {
                     e.preventDefault();
                     history.push('/login')
 
-                    client.clearStore() //<---  introduces bugs with router history!
+                    client.clearStore()
 
-                    client.writeData({data: {loggedIn: false}})
+                    client.writeData({data: {loggedIn: false, todos:[]}})
                     localStorage.removeItem('token')
                     localStorage.setItem('loggedIn', false)
                   }} className='navbar-item' to="#">Logout </NavLink>

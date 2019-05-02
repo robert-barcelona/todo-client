@@ -51,7 +51,7 @@ const client = new ApolloClient({
   cache,
 });
 
-cache.writeData({data:{loggedIn:false}})
+cache.writeData({data:{loggedIn:false, todos: [], test:'abc'}})
 
 ReactDOM.render(
   <BrowserRouter>

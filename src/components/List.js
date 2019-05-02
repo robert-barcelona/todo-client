@@ -2,6 +2,20 @@ import React, {Component} from 'react'
 import gql from 'graphql-tag'
 import {Query, Mutation} from 'react-apollo'
 
+const GET_TODOS_LOCAL = gql`
+  {
+    todos @client {
+      id
+      body
+      title
+      completed
+      added
+      user {
+        username
+      }
+    }
+  }
+`;
 
 
 const GET_TODOS_FILTERED = gql`
@@ -107,7 +121,15 @@ class List extends Component {
         <section className='column is-half'>
 
           <Mutation mutation={ADD_TODO}
-                    refetchQueries={this.refetchAllFilteredTodos}
+                    //refetchQueries={this.refetchAllFilteredTodos}
+                    update={(cache, { data: { addTodo } }) => {
+                      console.log('addTodo from data',addTodo)
+                      const { todos } = cache.readQuery({ query: GET_TODOS_LOCAL });
+                      cache.writeQuery({
+                        query: GET_TODOS_LOCAL,
+                        data: { todos: todos.concat([addTodo]) },
+                      });
+                    }}
           >
             {(addTodo, {loading, error, data}) => {
               if (loading) return <div>Loading...</div>
