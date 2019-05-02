@@ -26,6 +26,7 @@ class Register extends Component {
   state = {
     username: '',
     password: '',
+    error: '',
   }
 
 
@@ -44,9 +45,7 @@ class Register extends Component {
                      onCompleted={(data) =>{
                        if (data && data.id) history.push('/login')}}>
       {(register, {data, error, loading}) => {
-        if (error) {
-          return <div>{error.toString()}</div>
-        }
+
         if (loading) return <div>Loading...</div>
         return (<form
           onSubmit={
@@ -62,6 +61,10 @@ class Register extends Component {
 
             }
           }>
+          { error && <div className='message is-warning'>
+            <div className="message-header">
+              {`${error.toString()}`}</div>
+          </div>}
           <div className="field">
             <p className="control has-icons-left has-icons-right">
               <input ref={this.usernameRef} value={username} onChange={this.setUsername} className="input" type="email"

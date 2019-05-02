@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
-import {Switch, Route,withRouter, NavLink, Redirect} from 'react-router-dom'
-import {Query, Mutation, ApolloConsumer} from 'react-apollo'
+import {Switch, Route, withRouter, NavLink, Redirect} from 'react-router-dom'
+import {Query, Mutation, withApollo, ApolloConsumer} from 'react-apollo'
 import gql from 'graphql-tag'
 
 import Login from './components/Login'
@@ -18,6 +18,12 @@ const GET_LOGGED_IN = gql`
 class App extends Component {
 
 
+  componentDidMount() {
+    const {props: {client}} = this
+    const token = localStorage.getItem('token')
+    console.log(`token: ${token}, client: ${client}`)
+    if (token && client) client.writeData({data: {loggedIn:true}})
+  }
 
   render() {
     const {props: {history}} = this
@@ -26,12 +32,13 @@ class App extends Component {
       {({loading, error, data, refetch}) => {
 
         const {loggedIn} = data
-
+        localStorage.setItem('loggedIn', loggedIn)
         return <div className="container">
           <header className="App-header">
             <div className='hero  has-background-warning has-text-link'>
-            <i className="fas fa-th-list"></i>To Do!<i className="fas fa-check-circle"></i> </div>
-            <nav className="navbar   has-background-warning has-text-link"   role="navigation" aria-label="main navigation">
+              <i className="fas fa-th-list"></i>To Do!<i className="fas fa-check-circle"></i></div>
+            <nav className="navbar   has-background-warning has-text-link" role="navigation"
+                 aria-label="main navigation">
 
               {!loggedIn && <NavLink className='navbar-item' to="/register">Register </NavLink>}
               {!loggedIn && <NavLink className='navbar-item' to="/login">Login </NavLink>}
@@ -45,6 +52,8 @@ class App extends Component {
                     client.clearStore() //<---  introduces bugs with router history!
 
                     client.writeData({data: {loggedIn: false}})
+                    localStorage.removeItem('token')
+                    localStorage.setItem('loggedIn', false)
                   }} className='navbar-item' to="#">Logout </NavLink>
 
                 )}
@@ -56,14 +65,14 @@ class App extends Component {
             <Route
               exact
               path='/login'
-              render={()=> !loggedIn ? <Login/> :  <Redirect to={{
+              render={() => !loggedIn ? <Login/> : <Redirect to={{
                 pathname: '/list',
               }}/>}
             />
             <Route
               exact
               path='/list'
-              render={()=> loggedIn ? <List/> :  <Redirect to={{
+              render={() => loggedIn ? <List/> : <Redirect to={{
                 pathname: '/login',
               }}/>}
             />
@@ -71,7 +80,7 @@ class App extends Component {
             <Route
               exact
               path='/register'
-              render={()=> !loggedIn ? <Register/> :  <Redirect to={{
+              render={() => !loggedIn ? <Register/> : <Redirect to={{
                 pathname: '/list',
               }}/>}
             />
@@ -86,4 +95,4 @@ class App extends Component {
   }
 }
 
-export default withRouter(App);
+export default withRouter(withApollo(App));

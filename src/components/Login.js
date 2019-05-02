@@ -54,9 +54,7 @@ class Login extends Component {
     }}>
       {(register, {data, error, loading, client}) => {
 
-        if (error) {
-          return <div>{error.toString()}</div>
-        }
+
         if (loading) return <div>Loading...</div>
 
         return (<form
@@ -73,6 +71,10 @@ class Login extends Component {
 
             }
           }>
+          { error && <div className='message is-warning'>
+            <div className="message-header">
+              {`${error.toString()}`}</div>
+          </div>}
           <div className="field">
             <p className="control has-icons-left has-icons-right">
               <input ref={this.usernameRef} value={username} onChange={this.setUsername} className="input" type="email"
