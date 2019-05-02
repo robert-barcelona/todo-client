@@ -49,7 +49,7 @@ class App extends Component {
                     e.preventDefault();
                     history.push('/login')
 
-                    client.clearStore() //<---  introduces bugs with router history!
+                    client.clearStore()
 
                     client.writeData({data: {loggedIn: false}})
                     localStorage.removeItem('token')
@@ -65,24 +65,28 @@ class App extends Component {
             <Route
               exact
               path='/login'
-              render={() => !loggedIn ? <Login/> : <Redirect to={{
+              component={Login}
+             /* render={() => true ? <Login/> : <Redirect to={{
                 pathname: '/list',
-              }}/>}
+              }}/>}*/
             />
             <Route
               exact
               path='/list'
-              render={() => loggedIn ? <List/> : <Redirect to={{
+              component={List}
+             /* render={() => loggedIn ? <List/> : <Redirect to={{
                 pathname: '/login',
-              }}/>}
+              }}/>}*/
             />
 
             <Route
               exact
               path='/register'
-              render={() => !loggedIn ? <Register/> : <Redirect to={{
+              component={Register}
+
+              /*render={() => !loggedIn ? <Register/> : <Redirect to={{
                 pathname: '/list',
-              }}/>}
+              }}/>}*/
             />
           </Switch>
           <section>

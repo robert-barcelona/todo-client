@@ -47,6 +47,7 @@ class Login extends Component {
       if (data && data.login) {
         const {login: {token}} = data
         if (token) {
+          console.log('setting localstorage token', token)
           localStorage.setItem('token', token)
           history.push('/list')
         }

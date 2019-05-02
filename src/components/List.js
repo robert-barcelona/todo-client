@@ -10,6 +10,7 @@ const GET_TODOS_FILTERED = gql`
       id
       body
       title
+      added
       completed
       user {
         username
@@ -85,7 +86,6 @@ class List extends Component {
   completedFilterCheckbox = (e, refetch) => {
     const showIncompleteOnly = e.target.checked
     this.setState({showIncompleteOnly})
-    //  refetch()
   }
 
   refetchAllFilteredTodos = () => {
@@ -103,6 +103,7 @@ class List extends Component {
 
     return (
       <div className='columns'>
+
         <section className='column is-half'>
 
           <Mutation mutation={ADD_TODO}
@@ -144,7 +145,7 @@ class List extends Component {
                   <p className="control has-icons-left">
                     <textarea ref={this.bodyRef} value={body} onChange={this.setBody}
                               className="textarea"
-                              placeholder="Body"></textarea>
+                              placeholder="      Body"></textarea>
                     <span className="icon is-small is-left">
         <i className="fas fa-pencil-alt"></i>
         </span>
@@ -167,6 +168,7 @@ class List extends Component {
         <section className='column is-half'>
 
           <Query query={GET_TODOS_FILTERED}
+
                  variables={{showIncompleteOnly, filterText}}
                  onCompleted={() => {
                    if (this.filterTextRef.current) this.filterTextRef.current.focus()
@@ -183,9 +185,7 @@ class List extends Component {
 
               return (
                 <div>
-                  <div className='level'>
-                    Todos
-                  </div>
+
                   <div className='columns'>
                     <div className='column is-one-third'>
                       <label className="checkbox">
@@ -208,7 +208,8 @@ class List extends Component {
                                                            key={todo.id}>
                       <p><strong>Title:</strong> {todo.title}</p>
                       <p><strong>Notes:</strong> {todo.body}</p>
-                      <p><strong>Owner:</strong> {todo.user.username}</p>
+                      <p><strong>Created:</strong> {todo.added}</p>
+                      <p><strong>Created by:</strong> {todo.user.username}</p>
                       <Mutation mutation={SET_TODO_COMPLETE} variables={{id: todo.id, completed: todo.completed}}
                                 refetchQueries={this.refetchAllFilteredTodos}
 

@@ -43,7 +43,7 @@ class Register extends Component {
 
     return <Mutation mutation={REGISTER}
                      onCompleted={(data) =>{
-                       if (data && data.id) history.push('/login')}}>
+                       if (data && data.register && data.register.id) history.push('/login')}}>
       {(register, {data, error, loading}) => {
 
         if (loading) return <div>Loading...</div>
