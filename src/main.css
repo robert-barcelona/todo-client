@@ -7,6 +7,13 @@
   display: inline-block;
 }
 
+ul.list p {
+  color: #ffe448;
+}
+ul.list p strong {
+  color: #ffe448;
+}
+
 nav {
   margin-bottom: 10px;
 }

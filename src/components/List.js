@@ -3,16 +3,7 @@ import gql from 'graphql-tag'
 import {Query, Mutation} from 'react-apollo'
 
 
-const GET_TODOS = gql`
-  query GetTodos {
-    getTodos {
-      id
-      body
-      title
-      completed
-    }
-  }
-`
+
 const GET_TODOS_FILTERED = gql`
   query GetTodosFiltered($showIncompleteOnly:Boolean! = false, $filterText:String) {
     getTodosFiltered(showIncompleteOnly:$showIncompleteOnly, filterText:$filterText) {
@@ -60,32 +51,6 @@ const DELETE_TODO = gql`
 
 `
 
-//let showCompleted = false
-
-/*const TodoItem = ({id, completed}) => {
-  const checkboxToggle = (onToggle, id, newCompleted) => {
-    onToggle({variables: {id, completed: newCompleted}})
-  }
-
-  return <Mutation mutation={SET_TODO_COMPLETE} variables={{id, completed}} refetchQueries={() => [{
-    query: GET_TODOS_FILTERED,
-    variables: {showCompleted}
-  }]}
-                   onError={(e) => console.log('error in TodoItem mutation', e)}>
-    {(toggle, {data, error, loading}) => {
-      return <label className="checkbox">
-        <input type="checkbox" checked={completed} onChange={e => checkboxToggle(toggle, id, e.target.checked)}/>
-        Completed
-      </label>
-    }
-
-    }
-
-
-  </Mutation>
-
-}*/
-
 
 class List extends Component {
 
@@ -126,9 +91,10 @@ class List extends Component {
   refetchAllFilteredTodos = () => {
     const {state: {showIncompleteOnly, filterText}} = this
     return [{
-    query: GET_TODOS_FILTERED,
-    variables: {showIncompleteOnly, filterText}
-  }]}
+      query: GET_TODOS_FILTERED,
+      variables: {showIncompleteOnly, filterText}
+    }]
+  }
 
 
   render() {
@@ -239,19 +205,19 @@ class List extends Component {
 
                   {data && data.getTodosFiltered && <ul className='list'>
                     {data.getTodosFiltered.map(todo => <li className='todoListItem has-text-warning has-background-link'
-                                                           key={todo.id}>Title: {todo.title},
-                      Body: {todo.body}
-                      Completed: {todo.completed ? 'true' : 'false'}
-                      Owner: {todo.user.username}
+                                                           key={todo.id}>
+                      <p><strong>Title:</strong> {todo.title}</p>
+                      <p><strong>Notes:</strong> {todo.body}</p>
+                      <p><strong>Owner:</strong> {todo.user.username}</p>
                       <Mutation mutation={SET_TODO_COMPLETE} variables={{id: todo.id, completed: todo.completed}}
                                 refetchQueries={this.refetchAllFilteredTodos}
 
                                 onError={(e) => console.log('error in TodoItem mutation', e)}>
                         {(toggle, {data, error, loading}) => {
-                          return <label className="checkbox"> Completed:
+                          return <label className="checkbox"> <p><strong>Completed:</strong>
                             <input type="checkbox" checked={todo.completed}
                                    onChange={e => this.checkboxToggle(toggle, todo.id, e.target.checked)}/>
-
+                          </p>
                           </label>
                         }
 
