@@ -1,5 +1,14 @@
 .hero {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  padding: 10px;
+  font-size: 2rem;
+}
+.hero i {
+  display: inline-block;
+}
+
+nav {
+  margin-bottom: 10px;
 }
 
 .todoListItem {

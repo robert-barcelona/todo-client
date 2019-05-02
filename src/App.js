@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import {Switch, Route, NavLink, Redirect} from 'react-router-dom'
+import {Switch, Route,withRouter, NavLink, Redirect} from 'react-router-dom'
 import {Query, Mutation, ApolloConsumer} from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -17,13 +17,11 @@ const GET_LOGGED_IN = gql`
 
 class App extends Component {
 
-  logout = e => {
-    e.preventDefault()
 
-    console.log('logout')
-  }
 
   render() {
+    const {props: {history}} = this
+
     return <Query query={GET_LOGGED_IN}>
       {({loading, error, data, refetch}) => {
 
@@ -31,21 +29,25 @@ class App extends Component {
 
         return <div className="container">
           <header className="App-header">
-            <nav className="navbar" role="navigation" aria-label="main navigation">
+            <div className='hero  has-background-warning has-text-link'>
+            <i className="fas fa-th-list"></i>To Do!<i className="fas fa-check-circle"></i> </div>
+            <nav className="navbar   has-background-warning has-text-link"   role="navigation" aria-label="main navigation">
 
               {!loggedIn && <NavLink className='navbar-item' to="/register">Register </NavLink>}
               {!loggedIn && <NavLink className='navbar-item' to="/login">Login </NavLink>}
               {loggedIn && <NavLink className='navbar-item' to="/list">Todos </NavLink>}
               {loggedIn && <ApolloConsumer>
                 {(client) => (
-                   <NavLink onClick={e => {
+                  <NavLink onClick={e => {
                     e.preventDefault();
-                    // client.clearStore()
+                    history.push('/login')
 
-                     client.writeData({data: {loggedIn: false}})
+                    client.clearStore() //<---  introduces bugs with router history!
+
+                    client.writeData({data: {loggedIn: false}})
                   }} className='navbar-item' to="#">Logout </NavLink>
 
-                  )}
+                )}
               </ApolloConsumer>}
             </nav>
           </header>
@@ -84,4 +86,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withRouter(App);

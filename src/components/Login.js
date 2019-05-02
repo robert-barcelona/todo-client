@@ -1,9 +1,8 @@
 import React, {Component} from 'react'
 import {Query, Mutation} from 'react-apollo'
 import gql from 'graphql-tag'
-import {library} from '@fortawesome/fontawesome-svg-core'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCheck, faEnvelope, faLock} from '@fortawesome/free-solid-svg-icons'
+import {withRouter} from 'react-router-dom'
+
 import '../main.scss'
 
 const LOGIN = gql`
@@ -111,7 +110,7 @@ class Login extends Component {
 }
 
 
-export default Login
+export default withRouter(Login)
 
 
 
